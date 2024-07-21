@@ -16,6 +16,7 @@ dataku <- read_excel("C:/R Script/Hierarcical Clustering/Hierarcical Clustering.
                                                    "numeric", "numeric"))
 dataku
 ```
+
 ```{r Melihat banyak nilai null}
 sum(is.na(dataku))
 ```
@@ -25,6 +26,7 @@ dataku$`Tahun / Year` <- factor(dataku$`Tahun / Year`)
 data <- as.data.frame(scale(dataku[,2:5]))
 round(head(data, 5),digits=3)
 ```
+
 ```{r Build jarak}
 data_dist <- dist(data)
 data_matrix <- as.matrix(data_dist)
