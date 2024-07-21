@@ -1,0 +1,51 @@
+---
+title: "Discriminant Analysis"
+output: word_document
+date: "2024-07-14"
+---
+
+```{r Import module}
+library(MASS)
+library(readxl)
+```
+
+```{r}
+dataku <- read_excel("C:/R Script/Discriminant Analysis/Discriminant Analysis.xlsx")
+head(dataku)
+```
+
+```{r Menghitung nilai NA pada data}
+sum(is.na(data))
+```
+```{r Standarisasi data}
+dataku[,1:8] <- lapply(dataku[,1:8], function(x) as.numeric(as.character(x)))
+variables_to_scale <- dataku[,1:8]
+variable_to_leave_unscaled <- dataku[,9]
+scaled_variables <- scale(variables_to_scale)
+head(round(scaled_variables,digits = 3))
+```
+
+```{r Gabung variabel scaled dan unscaled ke satu data frame}
+data <- data.frame(scaled_variables, variable_to_leave_unscaled)
+round(data,digits = 3)
+```
+
+```{r Model analisis diskriminan linear}
+lda_model <- lda(data$Result ~ data$Total.Bilirubin+data$Direct.Bilirubin+data$X.Alkphos.Alkaline.Phosphotase+
+                   data$X.Sgpt.Alamine.Aminotransferase+data$Sgot.Aspartate.Aminotransferase+data$Total.Protiens+data$X.ALB.Albumin+
+                   data$A.G.Ratio.Albumin.and.Globulin.Ratio)
+
+# Print the results
+print(lda_model)
+```
+
+```{r Analisis performa menggunakan confusion matrix}
+fit.val <- predict(lda_model, data[, 1:8])
+ct <- table(data$Result,fit.val$class)
+ct
+```
+
+```{r Performa keseluruhan model}
+diag(prop.table(ct,1))
+sum(diag(prop.table(ct)))
+```

@@ -1,0 +1,69 @@
+---
+title: "PCA"
+output: word_document
+date: "2024-07-11"
+---
+
+```{r Import module}
+library(car)
+library(dplyr)
+library(readxl)
+```
+
+```{r Inisialisasi data}
+data <- read_excel("C:/R Script/Principal Component Analysis/PCA.xlsx") 
+data <- data[,-1]
+data
+```
+```{r Melihat banyak nilai null}
+sum(is.na(data))
+```
+
+```{r Standarisasi data}
+data1 <- as.data.frame(scale(data))
+data1_matrix <- round(as.matrix(data1),digits=3)
+cat("\nData Hasil Standarisasi:\n")
+head(data1_matrix, 5)
+```
+
+
+```{r Matriks varian covarian}
+covarian <- var(data1)
+cat("\nCovarian:\n")
+round(covarian,digits=3)
+```
+
+```{r Mencari nilai eigen dan vektor eigen}
+eigen <- eigen(covarian)
+eigen_val = eigen$values
+eigen_vec = eigen$vectors
+cat("Nilai Eigen:\n")
+round(eigen_val,digits=3)
+cat("\nVektor Eigen:\n")
+round(eigen_vec,digits=3)
+```
+```{r Menghitung proporsi pada masing-masing nilai eigen}
+sum = sum(eigen_val)
+percentage_eigen_values <- (eigen_val / sum) * 100
+cat("\nProporsi Nilai Eigen:\n")
+round(percentage_eigen_values,digits=3)
+```
+```{r Menggunakan plot}
+plot(percentage_eigen_values[1:8], type = "b", main = "Scree Plot", xlab = "Principal Components", ylab = "Eigenvalues")
+abline(h=16, col="orange",lty=2)
+legend("center",legend=c("Eigen Value=2"), col=c("orange"),lty=5,cex=0.5)
+```
+```{r Membuat plot bar dan presentase tiap bar}
+bar_positions <- barplot(eigen_val[1:8], main = "Scree Plot", xlab = "Principal Components", ylab = "Eigenvalues")
+
+text(x = bar_positions, 
+     y = eigen_val[1:8], 
+     label = paste0(round(percentage_eigen_values[1:8], 2), "%"), 
+     pos = 3, cex = 0.8, col = "black")
+```
+```{r Menampilkan kolom hasil PCA}
+eigen_sel <- eigen_vec[, 1:2]
+transform <- data1_matrix %*% eigen_sel
+df_transform <- as.data.frame(transform)
+round(df_transform,digits=3)
+```

@@ -1,0 +1,52 @@
+---
+title: "Hierarcical Clustering"
+output: word_document
+date: "2024-07-11"
+---
+
+```{r Import module}
+library(cluster)
+library(tidyverse)
+library(readxl)
+```
+
+```{r Inisialisasi data}
+dataku <- read_excel("C:/R Script/Hierarcical Clustering/Hierarcical Clustering.xlsx", 
+                                     col_types = c("text", "numeric", "numeric", 
+                                                   "numeric", "numeric"))
+dataku
+```
+```{r Melihat banyak nilai null}
+sum(is.na(dataku))
+```
+
+```{r Standarisasi data}
+dataku$`Tahun / Year` <- factor(dataku$`Tahun / Year`)
+data <- as.data.frame(scale(dataku[,2:5]))
+round(head(data, 5),digits=3)
+```
+```{r Build jarak}
+data_dist <- dist(data)
+data_matrix <- as.matrix(data_dist)
+round(data_matrix,digits=3)
+```
+
+```{r Plot 3 cluster}
+single <- hclust(data_dist, method="single")
+plot(single, dataku$`Tahun / Year`, labels=dataku$`Tahun / Year`)
+rect.hclust(single,3)
+```
+
+```{r Daftar nama & cluster}
+anggota <- data.frame(id=dataku$`Tahun / Year`, cutree(single,k=3))
+anggota
+```
+
+```{r Rata-rata nilai tiap cluster}
+datas <- dataku[,2:5] %>%
+  mutate(cluster = anggota[, 2])
+summary <- datas %>%
+  group_by(cluster) %>%
+  summarise_all(mean)
+summary
+```

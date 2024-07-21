@@ -1,0 +1,55 @@
+---
+title: "Factor Analysis"
+output: word_document
+date: "2024-07-12"
+---
+
+```{r Import module}
+library(readxl)
+library(sandwich)
+library(psych)
+library(nFactors)
+library(REdaS)
+```
+
+```{r Inisialisasi data}
+data <- read_excel("C:/R Script/Factor Analysis/Factor Analysis.xlsx")
+dataku <- data[,-1]
+head(dataku)
+```
+
+```{r Melihat banyak nilai null}
+sum(is.na(dataku))
+```
+
+```{r Standarisasi data}
+datame <- scale(dataku)
+cat("\nData hasil standarisasi:\n")
+head(round(datame,digits=3))
+```
+
+```{r Uji bartlett sphericity dan KMO}
+bart_spher(datame)
+KMO(datame)
+```
+```{r Mencari nilai eigen dan vektor eigen}
+R <- cov(datame)
+eigen_data <- eigen(R)
+cat("\nNilai Eigen:\n")
+eigen_data $values
+```
+```{r Penentuan jumlah factor}
+ap <- parallel(subject=20, var=6, rep=100, cent=0.05)
+nfaktor <- nScree (eigen$values, ap$eigen$qevpea)
+plotnScree(nfaktor)
+```
+
+```{r Analisis factor menggunakan metode Estimasi Maximum Likelihood}
+solution_fac <- factanal(factors=2, covmat=R)
+solution_fac
+```
+```{r Analisis factor menggunakan metode Estimasi Principal Component}
+solution_pa <- fa(R, nfactors=2, rotate="varimax", fm="pa")
+solution_pa
+```
+

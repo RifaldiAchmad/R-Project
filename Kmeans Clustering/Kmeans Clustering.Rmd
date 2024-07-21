@@ -1,0 +1,84 @@
+---
+title: "Kmeans Clustering"
+output: word_document
+date: "2024-07-14"
+---
+
+```{r Import module}
+library(cluster)
+library(factoextra)
+library(ggplot2)
+library(tidyverse)
+library(dplyr)
+library(scales)
+library(readxl)
+library(reshape2)
+```
+
+```{r Inisialisasi data}
+data <- read_excel("C:/R Script/Kmeans Clustering/Kmeans Clustering.xlsx")
+dataku <- data[,-1]
+dataku
+```
+```{r Melihat banyak nilai null}
+sum(is.na(dataku))
+```
+```{r Membuat boxplot untuk setiap variabel}
+datame_long <- melt(dataku)
+ggplot(datame_long, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  labs(title = "Boxplot untuk Deteksi Outlier",
+       x = "Variabel",
+       y = "Nilai")
+```
+```{r Transformasi log pada data}
+data_trans <- log(dataku)
+```
+
+```{r Membuat boxplot untuk setiap variabel}
+datame_long <- melt(data_trans)
+ggplot(datame_long, aes(x = variable, y = value)) +
+  geom_boxplot() +
+  labs(title = "Boxplot untuk Deteksi Outlier",
+       x = "Variabel",
+       y = "Nilai")
+```
+
+```{r Standarisasi data}
+summary(data_trans)
+scale <- dataku %>%
+  mutate(across(everything(), ~ scale(.) %>% as.vector))
+round(scale,digits=3)
+```
+```{r Mencari cluster optimal}
+fviz_nbclust(data_trans, kmeans, method="wss")
+fviz_nbclust(data_trans, kmeans, method="silhouette")
+```
+```{r Visualisasi cluster}
+final <- kmeans(data_trans, 2)
+fviz_cluster(final, data=data_trans)
+```
+```{r Menghitung jumlah data dalam setiap clusterr}
+cluster_counts <- table(final$cluster)
+cluster_counts
+```
+
+```{r Rata-rata tiap cluster}
+means <- dataku %>% mutate(cluster=final$cluster) %>% 
+  group_by(cluster) %>% summarise_all("mean")
+means
+```
+```{r Plot perbandingan nilai rata-rata tiap cluster}
+# Transformasikan data dari wide format ke long format
+means_long <- means %>%
+  pivot_longer(-cluster, names_to = "variable", values_to = "mean_value")
+
+# Buat bar chart
+ggplot(means_long, aes(x = variable, y = mean_value, fill = as.factor(cluster))) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  labs(title = "Rata-rata Nilai Tiap Cluster", x = "Variabel", y = "Rata-rata Nilai", fill = "Cluster") +
+  theme_minimal() +
+  scale_y_continuous(labels = comma, breaks = seq(0, max(means_long$mean_value), by = 1000)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
