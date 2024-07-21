@@ -3,6 +3,7 @@ title: "Singular Value Decomposition"
 output: word_document
 date: "2024-07-15"
 ---
+
 ```{r Import module}
 library(readxl)
 ```
@@ -14,10 +15,12 @@ data <- read_excel("C:/R Script/Singular Value Decomposition/Singular Value Deco
         "numeric", "numeric"))
 head(data)
 ```
+
 ```{r Jadikan matriks}
 data_matrix <- as.matrix(data)
 head(round(data_matrix,digits=3))
 ```
+
 ```{r Menerapkan svd}
 svd_result <- svd(data_matrix)
 u <- svd_result$u
@@ -30,6 +33,7 @@ svd_result
 cat("\nMatriks orthogonal kiri\n")
 head(u)
 ```
+
 ```{r Vektor nilai singular}
 cat("\nVektor nilai singular\n")
 d
@@ -39,6 +43,7 @@ d
 cat("\nMatriks orthogonal kanan\n")
 head(v)
 ```
+
 ```{r Mengonstruksi ulang matriks asli}
 reconstructed_matrix <- u %*% diag(d) %*% t(v)
 head(reconstructed_matrix)
@@ -48,4 +53,3 @@ head(reconstructed_matrix)
 dim(data)
 dim(reconstructed_matrix)
 ```
-
