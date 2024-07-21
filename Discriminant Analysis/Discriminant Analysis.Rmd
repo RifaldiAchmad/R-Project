@@ -17,6 +17,7 @@ head(dataku)
 ```{r Menghitung nilai NA pada data}
 sum(is.na(data))
 ```
+
 ```{r Standarisasi data}
 dataku[,1:8] <- lapply(dataku[,1:8], function(x) as.numeric(as.character(x)))
 variables_to_scale <- dataku[,1:8]
@@ -34,7 +35,6 @@ round(data,digits = 3)
 lda_model <- lda(data$Result ~ data$Total.Bilirubin+data$Direct.Bilirubin+data$X.Alkphos.Alkaline.Phosphotase+
                    data$X.Sgpt.Alamine.Aminotransferase+data$Sgot.Aspartate.Aminotransferase+data$Total.Protiens+data$X.ALB.Albumin+
                    data$A.G.Ratio.Albumin.and.Globulin.Ratio)
-
 # Print the results
 print(lda_model)
 ```
