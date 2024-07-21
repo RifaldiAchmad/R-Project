@@ -20,9 +20,11 @@ data <- read_excel("C:/R Script/Kmeans Clustering/Kmeans Clustering.xlsx")
 dataku <- data[,-1]
 dataku
 ```
+
 ```{r Melihat banyak nilai null}
 sum(is.na(dataku))
 ```
+
 ```{r Membuat boxplot untuk setiap variabel}
 datame_long <- melt(dataku)
 ggplot(datame_long, aes(x = variable, y = value)) +
@@ -31,6 +33,7 @@ ggplot(datame_long, aes(x = variable, y = value)) +
        x = "Variabel",
        y = "Nilai")
 ```
+
 ```{r Transformasi log pada data}
 data_trans <- log(dataku)
 ```
@@ -50,14 +53,17 @@ scale <- dataku %>%
   mutate(across(everything(), ~ scale(.) %>% as.vector))
 round(scale,digits=3)
 ```
+
 ```{r Mencari cluster optimal}
 fviz_nbclust(data_trans, kmeans, method="wss")
 fviz_nbclust(data_trans, kmeans, method="silhouette")
 ```
+
 ```{r Visualisasi cluster}
 final <- kmeans(data_trans, 2)
 fviz_cluster(final, data=data_trans)
 ```
+
 ```{r Menghitung jumlah data dalam setiap clusterr}
 cluster_counts <- table(final$cluster)
 cluster_counts
@@ -68,6 +74,7 @@ means <- dataku %>% mutate(cluster=final$cluster) %>%
   group_by(cluster) %>% summarise_all("mean")
 means
 ```
+
 ```{r Plot perbandingan nilai rata-rata tiap cluster}
 # Transformasikan data dari wide format ke long format
 means_long <- means %>%
@@ -81,4 +88,3 @@ ggplot(means_long, aes(x = variable, y = mean_value, fill = as.factor(cluster)))
   scale_y_continuous(labels = comma, breaks = seq(0, max(means_long$mean_value), by = 1000)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
-
